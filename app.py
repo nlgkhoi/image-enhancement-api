@@ -22,9 +22,15 @@ def enhance0():
     folder_in="static/clients/input/"+format(client_count,'04d')+"/"
     folder_out="static/clients/output/"+format(client_count,'04d')+"/"
     #
-    os.makedirs(folder_in)
+    try:
+      os.makedirs(folder_in)
+    except:
+      pass
+    try:
+      os.makedirs(folder_out)
+    except:
+      pass
     clear_folder(folder_in)
-    os.makedirs(folder_in)
     clear_folder(folder_out)
     begin=time.time()
     im_pre=Im_preprocess()
