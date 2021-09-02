@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify, send_from_directory,
 from flask_cors import CORS
 import time
 
-from demo import *
+from demo_no_deblur import *
 from preprocessing_img import *
 
 app = Flask(__name__)
