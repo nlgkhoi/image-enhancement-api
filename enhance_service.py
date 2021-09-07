@@ -1,3 +1,4 @@
+import logging
 import os
 # from enlighten_inference import EnlightenOnnxModel
 import uuid
@@ -26,8 +27,9 @@ from white_balancer import WhiteBalancer
 
 class EnhanceService:
 
-    def __init__(self, deblur_model_path, use_cpu: bool = True):
+    def __init__(self, deblur_model_path, use_cpu: bool = True, use_deblur_model: bool = False):
         self.use_cpu = use_cpu
+        self.use_deblur_model = use_deblur_model
         # Executor to run enhance process concurrently
         self.executor = ThreadPoolExecutor(max_workers=8)
         # A downloader to download image using a thread pool with 16 threads
@@ -46,18 +48,17 @@ class EnhanceService:
         self.white_balancer = WhiteBalancer()
         self.ceiq_scoring_model = CEIQ()
 
-        print(f'white_balancer: {type(self.white_balancer)}')
-        print(f'CEIQ_model: {type(self.ceiq_scoring_model)}')
-        print(f'Model: {type(self.deblur_model)}')
-
-        print("Init successfully")
+        logging.info(f'white_balancer: {type(self.white_balancer)}')
+        logging.info(f'CEIQ_model: {type(self.ceiq_scoring_model)}')
+        logging.info(f'Model: {type(self.deblur_model)}')
+        logging.info("Init successfully")
 
     @profiler()
     def process(self, image_urls: List[str], enhanced_out_dir):
         image_dict = self.image_downloader.bulk_download_as_image(image_urls)
         if len(image_urls) == 0:
             raise Exception(f"No image urls found at {image_urls}")
-        print('Number of files: ', len(image_dict))
+        logging.info('Number of files: %d', len(image_dict))
 
         future_to_checks = {
             self.executor.submit(self._enhance_image, image, 8, enhanced_out_dir): url
@@ -69,27 +70,30 @@ class EnhanceService:
         # The try-except-else clause is omitted here
         for future in futures.as_completed(future_to_checks):
             url = future_to_checks[future]
-            output_path = future.result()
-            result_dict[url] = output_path
+            output_path, enhanced_score = future.result()
+            result_dict[url] = {
+                'enhanced_url': output_path,
+                'enhanced_score': enhanced_score
+            }
         return result_dict
 
     @profiler()
-    def _enhance_image(self, image, factor, out_dir) -> str:
-        restored = self._deblur_image(image, factor)
+    def _enhance_image(self, image, factor, out_dir) -> [str, float]:
+        restored = self._deblur_image(image, factor) if self.use_deblur_model else np.asarray(image)
         # processed = enlighten_model.predict(cv2.cvtColor(restored, cv2.COLOR_RGB2BGR))
         # processed = img_as_ubyte(processed)
         img_output = self._process_white_balancing(restored)
 
         restored = cv2.cvtColor(restored, cv2.COLOR_RGB2BGR)
 
-        scores = self._calc_score([restored, img_output])
-        if scores[0] > scores[1]:
+        origin_score, improved_score = self._calc_score([restored, img_output])
+        if origin_score > improved_score:
             img_output = restored
 
-        output_path = os.path.join(out_dir, f'{uuid.uuid1()}.png')
+        output_path = os.path.join(out_dir, f'{uuid.uuid1()}.jpg')
         save_img(output_path, img_output)
 
-        return output_path
+        return [output_path, ((improved_score - origin_score) / origin_score)]
 
     @profiler()
     def _deblur_image(self, img, factor: int = 8):
@@ -134,12 +138,12 @@ class EnhanceService:
         # Process image for gamma correction
         output_image = None
         if t < -threshold:  # Dimmed Image
-            print('Dimmed')
+            logging.info('Dimmed')
             result = self.white_balancer.process_dimmed(Y)
             YCrCb[:, :, 0] = result
             output_image = cv2.cvtColor(YCrCb, cv2.COLOR_YCrCb2BGR)
         elif t > threshold:
-            print('Bright Image')  # Bright Image
+            logging.info('Bright Image')  # Bright Image
             result = self.white_balancer.process_bright(Y)
             YCrCb[:, :, 0] = result
             output_image = cv2.cvtColor(YCrCb, cv2.COLOR_YCrCb2BGR)
@@ -154,5 +158,5 @@ class EnhanceService:
         # org_score = CEIQ_model.predict(np.expand_dims(restored, axis=0), 1)[0]
         # imp_score = CEIQ_model.predict(np.expand_dims(img_output, axis=0), 1)[0]
         scores = self.ceiq_scoring_model.predict(images, option=1)
-        print(f"Scores: {scores[0]} -> {scores[1]}: Improved: {((scores[1] - scores[0]) * 100 / scores[0])} %")
+        logging.info(f"Scores: {scores[0]} -> {scores[1]}: Improved: {((scores[1] - scores[0]) * 100 / scores[0])} %")
         return scores

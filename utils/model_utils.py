@@ -11,6 +11,7 @@ def bypass_ssl_verify():
     if (not os.environ.get('PYTHONHTTPSVERIFY', '') and getattr(ssl, '_create_unverified_context', None)):
         ssl._create_default_https_context = ssl._create_unverified_context
 
+
 def save_img(filepath, img):
     import cv2
     # cv2.imwrite(filepath,cv2.cvtColor(img, cv2.COLOR_RGB2BGR))

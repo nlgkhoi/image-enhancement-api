@@ -1,0 +1,11 @@
+server:
+  http:
+    nthreads: 4
+    port: 31558
+#    port: 8080
+downloader:
+  num_threads: 8
+
+run_on_cpu: True
+use_deblur_model: False
+deblur_model_path: "Deblurring/pretrained_models/model_deblurring.pth"
