@@ -54,7 +54,6 @@ class Config(object):
     """
 
     def __init__(self, config_yaml: str, config_override: List[Any] = []):
-
         self._C = CN()
         self._C.GPU = [0]
         self._C.VERBOSE = False

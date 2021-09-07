@@ -1,20 +1,31 @@
 # Instruction
+
 ## Install linraries
+
 ```
 pip install requirements.txt
 ```
+
 ## Testing API
+
 - First, running the ./app.py file.
+
 ```
 python app.py
 ```
+
 - Then runing the ./request.py to send request to the API.
+
 ```
 python request.py
 ```
+
 ## About the api
+
 - The API receive raw JSON data.
-- You have to post raw JSON data, which contains the element 'urls' having an array of images need to be enhanced. Here is an example.
+- You have to post raw JSON data, which contains the element 'urls' having an array of images need to be enhanced. Here
+  is an example.
+
 ```
 {
     "urls":[
@@ -23,9 +34,12 @@ python request.py
     ]
 }
 ```
+
 - In Postman, we will post data like this.
-![alt text](images/1.png)
+  ![alt text](images/1.png)
+
 ## About the result
+
 ```
 {
     "result": [
@@ -41,5 +55,6 @@ python request.py
     "time": 25.083990812301636
 }
 ```
+
 ![](images/2.png)
 
