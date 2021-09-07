@@ -8,16 +8,10 @@ pip install requirements.txt
 
 ## Testing API
 
-- First, running the ./app.py file.
+- First, running the ./main.py file.
 
 ```
-python app.py
-```
-
-- Then runing the ./request.py to send request to the API.
-
-```
-python request.py
+python main.py
 ```
 
 ## About the api
@@ -25,36 +19,30 @@ python request.py
 - The API receive raw JSON data.
 - You have to post raw JSON data, which contains the element 'urls' having an array of images need to be enhanced. Here
   is an example.
-
-```
+  
+- Method: `POST`
+- Endpoint: `/enhance`
+- Request body:
+```json
 {
-    "urls":[
-        "https://genk.mediacdn.vn/k:thumb_w/640/2014/mg-1235-3-1416328703227/cuu-sang-anh-bang-vai-thao-tac-don-gian-trong-photoshop.jpg",
-      "https://th.bing.com/th/id/R.7924efd2efd3b67225ebb6cc82331bc8?rik=TKz8a7gW1Ur9zw&riu=http%3a%2f%2fpalistudio.com%2fupload%2fimage%2fdata%2fTin-tuc%2fChup-anh-cuoi%2fHa-Noi%2fZEN1242-d23a92.jpg&ehk=HgnL8rnD6HnJRBawFWnFTJC8HacfoC%2f75d5xrPwGDxI%3d&risl=&pid=ImgRaw&r=0"
-    ]
+	"urls": [
+		"https://genk.mediacdn.vn/k:thumb_w/640/2014/mg-1235-3-1416328703227/cuu-sang-anh-bang-vai-thao-tac-don-gian-trong-photoshop.jpg",
+		"https://cdn.chotot.com/VgLdQ9uGutyeCuuNZUoqj8OuRtkNHCW38C9mG79wm6Q/preset:view/plain/989aca426d1a4759a2be4ddfe824fcde-2712313909326265231.jpg"
+	]
 }
 ```
+- Response:
 
-- In Postman, we will post data like this.
-  ![alt text](images/1.png)
-
-## About the result
-
-```
+```json
 {
-    "result": [
-        {
-            "after": "/get_image/0002/0001.png",
-            "before": "https://genk.mediacdn.vn/k:thumb_w/640/2014/mg-1235-3-1416328703227/cuu-sang-anh-bang-vai-thao-tac-don-gian-trong-photoshop.jpg"
-        },
-        {
-            "after": "/get_image/0002/0000.png",
-            "before": "https://th.bing.com/th/id/R.7924efd2efd3b67225ebb6cc82331bc8?rik=TKz8a7gW1Ur9zw&riu=http%3a%2f%2fpalistudio.com%2fupload%2fimage%2fdata%2fTin-tuc%2fChup-anh-cuoi%2fHa-Noi%2fZEN1242-d23a92.jpg&ehk=HgnL8rnD6HnJRBawFWnFTJC8HacfoC%2f75d5xrPwGDxI%3d&risl=&pid=ImgRaw&r=0"
-        }
-    ],
-    "time": 25.083990812301636
+  "https://genk.mediacdn.vn/k:thumb_w/640/2014/mg-1235-3-1416328703227/cuu-sang-anh-bang-vai-thao-tac-don-gian-trong-photoshop.jpg": {
+    "enhanced_url": "static/output/c87d44e6-0faf-11ec-98c4-acde48001122.jpg",
+    "enhanced_score": 0.0385232438655613
+  },
+  "https://cdn.chotot.com/VgLdQ9uGutyeCuuNZUoqj8OuRtkNHCW38C9mG79wm6Q/preset:view/plain/989aca426d1a4759a2be4ddfe824fcde-2712313909326265231.jpg": {
+    "enhanced_url": "static/output/c88e69f6-0faf-11ec-98c4-acde48001122.jpg",
+    "enhanced_score": 0.005570224491517227
+  }
 }
 ```
-
-![](images/2.png)
 

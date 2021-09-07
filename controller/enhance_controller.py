@@ -18,4 +18,4 @@ enhance_blueprint = Blueprint("enhance", __name__)
 def detect(enhance_service: EnhanceService = Provide[ApplicationContainer.enhance_service]):
     urls = dict(request.get_json())['urls']
     output_result = enhance_service.process(urls, folder_out)
-    return build_response(result=output_result)
+    return build_response(**output_result)
