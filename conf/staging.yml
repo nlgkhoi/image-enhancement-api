@@ -8,4 +8,5 @@ downloader:
 
 run_on_cpu: True
 use_deblur_model: False
+enhanced_output_only: False
 deblur_model_path: "Deblurring/pretrained_models/model_deblurring.pth"

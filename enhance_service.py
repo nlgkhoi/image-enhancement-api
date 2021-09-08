@@ -27,9 +27,15 @@ from white_balancer import WhiteBalancer
 
 class EnhanceService:
 
-    def __init__(self, deblur_model_path, use_cpu: bool = True, use_deblur_model: bool = False):
+    def __init__(self,
+                 deblur_model_path,
+                 use_cpu: bool = True,
+                 use_deblur_model: bool = False,
+                 enhanced_output_only: bool = False,
+                 ):
         self.use_cpu = use_cpu
         self.use_deblur_model = use_deblur_model
+        self.enhanced_output_only = enhanced_output_only
         # Executor to run enhance process concurrently
         self.executor = ThreadPoolExecutor(max_workers=8)
         # A downloader to download image using a thread pool with 16 threads
@@ -85,9 +91,8 @@ class EnhanceService:
         img_output = self._process_white_balancing(restored)
 
         restored = cv2.cvtColor(restored, cv2.COLOR_RGB2BGR)
-
         origin_score, improved_score = self._calc_score([restored, img_output])
-        if origin_score > improved_score:
+        if origin_score > improved_score and self.enhanced_output_only:
             img_output = restored
 
         output_path = os.path.join(out_dir, f'{uuid.uuid1()}.jpg')

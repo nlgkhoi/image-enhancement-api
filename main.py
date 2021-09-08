@@ -39,7 +39,6 @@ def setup_http_server(
         threads=nthreads if nthreads is not None else 4
     )
 
-
 if __name__ == "__main__":
     os.environ['APP_MODE'] = sys.argv[1] if len(sys.argv) > 1 else 'development'
     setup_logging()
