@@ -1,8 +1,6 @@
 version: "3.3"
 services:
   image_enhancement:
-#    image: registry.rever.vn/ai-research/room-detection:master
-#    image: registry.rever.vn/ai-research/room-detection:v1.0.0
     image: image_enhancement
     build: .
     command: ["python3","/app/main.py", "staging"]
